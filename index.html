@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Q&A Game</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhai+2&family=Sarabun&display=swap">
+    <style>
+        body {
+            font-family: 'Baloo Bhai 2', cursive;
+            background-color: #e0f7fa;
+            background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            color: #2e7d32;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            font-size: 18px; /* Increase body font size */
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(46, 125, 50, 0.7);
+            text-align: center;
+            width: 900px;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 200px; /* Adjust logo size */
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .logo-mini {
+            max-width: 100px; /* Adjust logo size */
+            height: auto;
+            right: 20px;
+            position: absolute;
+            
+        }
+
+        .choice-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;   
+        }
+
+        .btn {
+            background-color: #66bb6a;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 40%;
+            font-family: 'Baloo Bhai 2', cursive;
+            transition: all 0.5s;
+            font-size: 16px; /* Increase button font size */
+            display: inline-block;
+        }
+
+
+        .btn span {
+          cursor: pointer;
+          display: inline-block;
+          position: relative;
+          transition: 0.5s;
+        }
+        
+        .btn span:after {
+          content: '\00bb';
+          position: absolute;
+          opacity: 0;
+          top: -40%;
+          left: -40px;
+          transition: 0.5s;
+          font-size: 1.5rem;
+        }
+
+        .btn:hover span {
+             padding-left: 15px;
+        }
+
+        .btn:hover span:after{
+            background-color: #66bb6a;
+            opacity: 1;
+            left: 0;
+        }
+
+        .choice-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        #score-container {
+            display: none;
+            font-size: 24px; /* Increase score font size */
+        }
+
+        .image-card {
+            margin: 20px auto;
+            max-width: 70%;
+            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-card img {
+            object-fit: contain;
+            width: 100%;
+            height: 40vh;
+        }
+
+        /* Thai font style */
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Baloo Bhai 2';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Baloo Bhai 2'), url('https://fonts.gstatic.com/s/baloobhai2/v6/I_urMpiDcvA0Yc7IGmV5ugWGiShB6aGz.woff2') format('woff2');
+        }
+
+        /* Positioning for fireworks */
+        .fireworks-left {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+        }
+
+        .fireworks-right {
+            position: absolute;
+            top: 0;
+            right: 50%;
+            transform: translateX(50%);
+            width: 800px;
+            height: 800px;
+        }
+
+        #question {
+            margin: 10px 0px 10px 0px ;
+        }
+    </style>
+</head>
+<body>
+    <dev>
+        <img src="https://lh3.google.com/u/1/d/1Ay43x7KpwnFZp4q76oPmzGEYZMjKQl-X=w2360-h1640-iv1" alt="Game Logo" width="300 vh">
+    </dev>
+    <div class="container" id="welcome-page">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoGaaEoA6hCMCFXpOTbTnxTEbrvAwC78fifA&s" alt="Game Logo" class="logo">
+        <h1>Welcome to Mini Q&A Game</h1>
+        <button id="start-game" class="btn thai">Start Game</button>
+    </div>
+
+    <div class="container" id="game-page" style="display: none;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoGaaEoA6hCMCFXpOTbTnxTEbrvAwC78fifA&s" alt="Game Logo" class="logo-mini">
+        
+        <div class="image-card">
+            <div id="question-container" class="thai">
+                <img id="question-image" src="" alt="Question Image" width="300vw">
+                <div id="question"></div>
+                <button class="btn thai"><span id="choice1"></span></button>
+                <button class="btn thai"><span id="choice2"></span></button>
+            </div>
+        </div>
+        <div id="score-container" class="thai">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <button id="restart" class="btn thai">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1.จากภาพ สื่อถึงเรื่องอะไร ?",
+                image: "https://lh3.googleusercontent.com/u/1/drive-viewer/AKGpiharwroQygUSBFxviaxQVx79Y-5e8Tr6vPbnodwCD_3yqj_yx6GPOrJgOPg9QkHraB7rKf-3AIKXjkoJcS2BgUwcwcWRnLUQXdQ=w2360-h1640-rw-v1", 
+                choices: ["A. ประหยัดพลังงาน", "B. แสงสว่าง"],
+                answer: "A. ประหยัดพลังงาน"
+            },
+            {
+                question: "2.การจัดการขยะด้วยหลักการ 3R R ตัวไหนคือการนำกลับมาใช้ซ้ำ ?",
+                image: "https://lh3.google.com/u/1/d/1zY6YoPKYuEVJ0By-Pb14FJ-z5SwVUlkm=w1920-h912-iv1", 
+                choices: ["A. REDUCE", "B. REUSE"],
+                answer: "B. REUSE"
+            },
+            {
+                question: "3.แบตเตอรี่ จัดเป็นขยะประเภทใด ?",
+                image: "https://lh3.google.com/u/1/d/1fs81npxRXhx0qzkPMmI8xmXmXKVY4e8I=w1920-h912-iv1", 
+                choices: ["A. ขยะอันตราย", "B. ขยะอุตสาหกรรม"],
+                answer: "A. ขยะอันตราย"
+            },
+            {
+                question: "4.จากรูปหมายถึง ส. อะไร ?",
+                image: "https://lh3.google.com/u/1/d/1umplIZjzr3buYtVahXV0Z5C-ith9vRXA=w1920-h1080-iv1", 
+                choices: ["A. ส.สะสาง", "B. ส.สะดวก"],
+                answer: "A. ส.สะสาง"
+            },
+            {
+                question: "5.ป้ายสัญลักษณ์ดังกล่าว หมายถึง ?",
+                image: "https://lh3.google.com/u/1/d/175OLeRCv3dAxYzbtDrltBs9IEcU0DrL6=w2360-h1640-iv1", 
+                choices: ["A. ทางหนีไฟ", "B. เส้นทางวิ่ง"],
+                answer: "A. ทางหนีไฟ"
+            },
+            {
+                question: "6.จากรูปเป็นถังดับเพลิงชนิดใด ?",
+                image: "https://lh3.google.com/u/1/d/1rxump-fEPBeUyJsijpzkMtDh3vZxkXxb=w2360-h1640-iv1", 
+                choices: ["A. ถังดับเพลิงผงเคมีแห้ง", "B. ถังดับเพลิง CO₂"],
+                answer: "B. ถังดับเพลิง CO₂"
+            },
+            {
+                question: "7.พลังงานน้ำขึ้น-น้ำลง สามารถผลิตกระแสไฟฟ้าได้ โดยไม่ต้องใช้น้ำมันเชื้อเพลิง มีต้นทุนต่ำและไม่ส่งผลเสียต่อสิ่งแวดล้อม ?",
+                image: "https://lh3.google.com/u/1/d/1pYBdt1lWclxUdYE6Sby0Iz79hk50uDA7=w2360-h1640-iv1", 
+                choices: ["A. ใช่", "B. ไม่ใช่"],
+                answer: "A. ใช่"
+            },
+            {
+                question: "8.การข้ามถนนตรงทางม้าลายเป็นการปฎิบัติตาม ส. อะไร ?",
+                image: "https://lh3.google.com/u/1/d/1WDMH5JHXioWGnpBxUZx_zPQY9tIj-r-P=w2360-h1640-iv1", 
+                choices: ["A. ส.สร้างนิสัย", "B. ส.สุขลักษณะ"],
+                answer: "A. ส.สร้างนิสัย"
+            },
+            {
+                question: "9.จากรูปภาพ เป็นถังขยะประเภทใด ?",
+                image: "https://lh3.google.com/u/1/d/1w-qs2PdP6DknqBFTENy0BkUDlYvOExPu=w2360-h1640-iv1", 
+                choices: ["A. ขยะรีไซเคิล", "B. ขยะทั่วไป"],
+                answer: "A. ขยะรีไซเคิล"
+            },
+            {
+                question: "10.จากภาพน้ำแข็งขั้วโลกละลาย สื่อความหมายอะไร ?",
+                image: "https://lh3.google.com/u/1/d/1yJzU_1O2a5Qt23ATRdMXyCfTC7UOfIBB=w2360-h1640-iv1", 
+                choices: ["A. อากาศหนาว", "B. ภาวะโลกร้อน"],
+                answer: "B. ภาวะโลกร้อน"
+            },
+            // Add your other questions here
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const welcomePage = document.getElementById('welcome-page');
+        const gamePage = document.getElementById('game-page');
+        const startButton = document.getElementById('start-game');
+
+        const questionContainer = document.getElementById('question-container');
+        const questionElement = document.getElementById('question');
+        const questionImage = document.getElementById('question-image');
+        const choice1Button = document.getElementById('choice1');
+        const choice2Button = document.getElementById('choice2');
+        const scoreContainer = document.getElementById('score-container');
+        const finalScoreElement = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart');
+
+        startButton.addEventListener('click', () => {
+            welcomePage.style.display = 'none';
+            gamePage.style.display = 'block';
+            showQuestion(questions[currentQuestionIndex]);
+        });
+
+        function showQuestion(question) {
+            questionElement.textContent = question.question;
+            questionImage.src = question.image;
+            choice1Button.textContent = question.choices[0];
+            choice2Button.textContent = question.choices[1];
+            enableChoices(); // Enable choices whenever a new question is displayed
+        }
+
+        function showFireworks() {
+            disableChoices(); // Disable choices during fireworks display
+
+            const fireworksLeft = document.createElement('img');
+            fireworksLeft.src = 'https://media.tenor.com/eJdAzjdhWFUAAAAj/cute.gif';
+            fireworksLeft.alt = 'Fireworks';
+            fireworksLeft.classList.add('fireworks-left');
+            document.body.appendChild(fireworksLeft);
+
+            const fireworksRight = document.createElement('img');
+            fireworksRight.src = 'https://cliply.co/wp-content/uploads/2021/09/CLIPLY_372109170_FREE_FIREWORKS_400.gif';
+            fireworksRight.alt = 'Fireworks';
+            fireworksRight.classList.add('fireworks-right');
+            document.body.appendChild(fireworksRight);
+
+            setTimeout(() => {
+                fireworksLeft.remove();
+                fireworksRight.remove();
+                moveNext();
+            }, 3000); // Remove fireworks after 3 seconds
+        }
+
+        function moveNext() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion(questions[currentQuestionIndex]);
+            } else {
+                questionContainer.style.display = 'none';
+                scoreContainer.style.display = 'block';
+                
+                finalScoreElement.textContent = `Your score is ${score}/${questions.length}.`;
+            }
+        }
+
+        function handleChoice(choice) {
+            const question = questions[currentQuestionIndex];
+            if (choice === question.answer) {
+                score++;
+                moveNext();
+            } else {
+                moveNext();
+            }
+        }
+
+        function disableChoices() {
+            choice1Button.classList.add('disabled');
+            choice2Button.classList.add('disabled');
+        }
+
+        function enableChoices() {
+            choice1Button.classList.remove('disabled');
+            choice2Button.classList.remove('disabled');
+        }
+
+        choice1Button.addEventListener('click', () => {
+            if (!choice1Button.classList.contains('disabled')) {
+                handleChoice(choice1Button.textContent)
+            }
+        });
+        choice2Button.addEventListener('click', () => {
+            if (!choice2Button.classList.contains('disabled')) {
+                handleChoice(choice2Button.textContent)
+            }
+        });
+
+        restartButton.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreContainer.style.display = 'none';
+            questionContainer.style.display = 'block';
+            showQuestion(questions[currentQuestionIndex]);
+
+            // Show welcome page and hide game page
+            gamePage.style.display = 'none';
+            welcomePage.style.display = 'block';
+        });
+
+    </script>
+</body>
+</html>
